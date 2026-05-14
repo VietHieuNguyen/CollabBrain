@@ -8,8 +8,8 @@ const app: Express = expess()
 clientRoutes(app);
 const PORT = process.env.PORT || 3000
 app.use(expess.json())
-app.use(expess.urlencoded({extended: true}))
+app.use(expess.urlencoded({ extended: true }))
 
-app.listen(PORT, ()=>{
+app.listen(PORT, () => {
   console.log(`App is listening on ${PORT}`)
 })

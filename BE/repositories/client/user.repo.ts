@@ -1,7 +1,7 @@
 import prisma from "../../config/prisma"
 
 export const findUserByEmail = async (email: string) => {
-  return prisma.user.findUnique({ where: { email: email, is_deleted: false, is_active: true } })
+  return prisma.user.findFirst({ where: { email: email, isDeleted: false, isActive: true } })
 }
 
 export const createUser = async (data: {
