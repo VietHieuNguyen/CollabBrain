@@ -2,13 +2,14 @@ import { Router } from "express";
 const router: Router = Router()
 import * as controller from "../../controllers/client/user.controller"
 import * as validate from "../../validates/client/user.validate"
-router.post("/login",validate.loginPost,controller.loginPost)
+import * as ratelimit from "../../middlewares/client/rateLimit.middleware"
+router.post("/login",ratelimit.authIpLimiter,validate.loginPost,ratelimit.loginEmailLimiter,controller.loginPost)
 
-router.post("/register",validate.registerPost, controller.registerPost)
-router.post("/register/verify-otp",validate.verifyOtpRegisterPost,controller.verifyOtpRegisterPost)
+router.post("/register",ratelimit.authIpLimiter,validate.registerPost, ratelimit.registerEmailLimiter,controller.registerPost)
+router.post("/register/verify-otp",ratelimit.authIpLimiter,validate.verifyOtpRegisterPost,ratelimit.verifyOtpEmailLimiter,controller.verifyOtpRegisterPost)
 
-router.post("/forgot-password/forgot",validate.forgotPasswordPost,controller.forgotPasswordPost)
-router.post("/forgot-password/otp", validate.verifyOTPPost, controller.verifyOTPPost)
-router.post("/forgot-password/reset",validate.resetPasswordPost, controller.resetPasswordPost)
+router.post("/forgot-password/forgot",ratelimit.authIpLimiter,validate.forgotPasswordPost,ratelimit.forgotPasswordEmailLimiter,controller.forgotPasswordPost)
+router.post("/forgot-password/otp", ratelimit.authIpLimiter,validate.verifyOTPPost, ratelimit.verifyOtpEmailLimiter,controller.verifyOTPPost)
+router.post("/forgot-password/reset",ratelimit.authIpLimiter,validate.resetPasswordPost,ratelimit.verifyOtpEmailLimiter, controller.resetPasswordPost)
 
 export const userRoutes = router
