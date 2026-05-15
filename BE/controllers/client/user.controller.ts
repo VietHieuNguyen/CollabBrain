@@ -5,7 +5,7 @@ import { forgotPasswordServiceSendMail, loginService, registerService, resetPass
 export const loginPost = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    
+
     const result = await loginService({ email, password })
     
     res.status(200).json({
@@ -101,6 +101,21 @@ export const resetPasswordPost = async (req: Request, res: Response) => {
     res.status(200).json({
       code: 200,
       data: result
+    })
+  } catch (error: any) {
+    res.status(400).json({
+      code: 400,
+      message: error.message
+    })
+  }
+}
+export const userProfile = (req: Request, res: Response)=>{
+  try {
+    const user = (req as any).user
+    res.status(200).json({
+      data: user,
+      message: "Lấy thông tin profile thành công",
+      code: 200
     })
   } catch (error: any) {
     res.status(400).json({
