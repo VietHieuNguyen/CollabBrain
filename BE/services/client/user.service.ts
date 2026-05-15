@@ -1,4 +1,3 @@
-import prisma from "../../config/prisma"
 import bcrypt from "bcrypt"
 import { generateUserAccessToken, generateUserRefreshToken } from "../../helpers/jwt";
 import { createUser, deleteOTP, findAnyUserByEmail, findOTPByEmail, findUserByEmail, resetPasswordUser, saveOTP } from "../../repositories/client/user.repo";

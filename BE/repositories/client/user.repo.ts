@@ -1,5 +1,17 @@
 import prisma from "../../config/prisma"
 
+export const userPublicSelect = {
+  id: true,
+  email: true,
+  name: true,
+  avatarUrl: true,
+  bio: true,
+  isActive: true,
+  isDeleted: true,
+  createdAt: true,
+  updatedAt: true
+}
+
 export const findUserByEmail = async (email: string) => {
   return prisma.user.findFirst({ where: { email: email, isDeleted: false, isActive: true } })
 }
@@ -9,7 +21,8 @@ export const findUserById = async (id: string) => {
       id: id,
       isDeleted: false,
       isActive: true
-    }
+    },
+    select: userPublicSelect
   })
 }
 export const findAnyUserByEmail = async (email: string) => {
