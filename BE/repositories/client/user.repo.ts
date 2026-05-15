@@ -1,4 +1,5 @@
 import prisma from "../../config/prisma"
+import { UserTypes } from "../../types/client/user.types"
 
 export const userPublicSelect = {
   id: true,
@@ -63,5 +64,15 @@ export const resetPasswordUser = async ({email, passwordHash}:{email: string, pa
     data:{
       passwordHash: passwordHash
     }
+  })
+}
+
+export const updateDataUser = async (id: string,data: UserTypes)=>{
+  return prisma.user.update({
+    where: {
+      id: id
+    },
+    data: data,
+    select: userPublicSelect
   })
 }

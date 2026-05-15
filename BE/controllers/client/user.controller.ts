@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { forgotPasswordServiceSendMail, loginService, registerService, resetPasswordService, verifyOTPForgotPassword, verifyOTPRegister } from "../../services/client/user.service";
+import { editProfileService, forgotPasswordServiceSendMail, loginService, registerService, resetPasswordService, verifyOTPForgotPassword, verifyOTPRegister } from "../../services/client/user.service";
+import { UserTypes } from "../../types/client/user.types";
 
 //[POSt] /user/login
 export const loginPost = async (req: Request, res: Response) => {
@@ -123,4 +124,22 @@ export const userProfile = (req: Request, res: Response)=>{
       message: error.message
     })
   }
+}
+ 
+export const editProfile = async(req: Request, res: Response)=>{
+  try {
+    const user = (req as any).user
+    const result = await editProfileService(user.id,req.body)
+    res.status(200).json({
+      code: 200,
+      data: result,
+      message: "Cập nhật profile thành công"
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      code: 400,
+      message: error.message
+    });
+  }
+
 }

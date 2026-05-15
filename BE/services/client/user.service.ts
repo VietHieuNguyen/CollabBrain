@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt"
 import { generateUserAccessToken, generateUserRefreshToken } from "../../helpers/jwt";
-import { createUser, deleteOTP, findAnyUserByEmail, findOTPByEmail, findUserByEmail, findUserById, resetPasswordUser, saveOTP } from "../../repositories/client/user.repo";
-import { Register, VerifyOTP, VerifyOTPRegister, ResetPassword } from "../../types/client/user.types";
+import { createUser, deleteOTP, findAnyUserByEmail, findOTPByEmail, findUserByEmail, findUserById, resetPasswordUser, saveOTP, updateDataUser } from "../../repositories/client/user.repo";
+import { Register, VerifyOTP, VerifyOTPRegister, ResetPassword, UserTypes } from "../../types/client/user.types";
 import { generateNumber } from "../../helpers/generate";
 import { sendmail } from "../../helpers/sendmail";
 
@@ -120,3 +120,8 @@ export const resetPasswordService = async ({email,otp, password}:ResetPassword)=
 }
 
 
+export const editProfileService = async(id: string, payload: UserTypes)=>{
+  const user = await updateDataUser(id, payload)
+return user
+
+}
