@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { editProfileService, forgotPasswordServiceSendMail, loginService, refreshTokenService, registerService, resetPasswordService, verifyOTPForgotPassword, verifyOTPRegister } from "../../services/client/user.service";
-import { UserTypes } from "../../types/client/user.types";
+import { cookieConfig } from "../../config/cookie";
 
 //[POSt] /user/login
 export const loginPost = async (req: Request, res: Response) => {
@@ -9,9 +9,7 @@ export const loginPost = async (req: Request, res: Response) => {
 
     const result = await loginService({ email, password })
     res.cookie("refreshToken", result.refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
+      ...cookieConfig,
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
     res.cookie("accessToken", result.accessToken, {
@@ -58,9 +56,7 @@ export const verifyOtpRegisterPost = async (req: Request, res: Response) => {
 
     const result = await verifyOTPRegister({ email, otp, password, name });
     res.cookie("refreshToken", result.refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
+      ...cookieConfig,
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
     res.cookie("accessToken", result.accessToken, {
@@ -122,15 +118,11 @@ export const resetPasswordPost = async (req: Request, res: Response) => {
     const result = await resetPasswordService({ email, otp, password })
 
     res.cookie("refreshToken", result.refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
+      ...cookieConfig,
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
     res.cookie("accessToken", result.accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
+      ...cookieConfig,
       maxAge: 5 * 60 * 1000
     })
 
@@ -191,9 +183,7 @@ export const refreshTokenPost = async (req: Request, res: Response) => {
     }
     const result = await refreshTokenService(refreshToken)
     res.cookie("accessToken", result.accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
+      ...cookieConfig,
       maxAge: 5 * 60 * 1000
     })
     res.status(200).json({
@@ -207,6 +197,25 @@ export const refreshTokenPost = async (req: Request, res: Response) => {
     return res.status(400).json({
       code: 400,
       message: error.message || "Phiên đăng nhập hết hạn"
+    })
+  }
+}
+
+
+//[POST] /user/logout
+export const logoutPost = async (req: Request, res: Response)=>{
+  try {
+    res.clearCookie('accessToken', cookieConfig);
+    
+    res.clearCookie('refreshToken', cookieConfig);
+    res.status(200).json({
+      code: 200,
+      message: "Đăng xuất thành công"
+    })
+  } catch (error) {
+    res.status(400).json({
+      code: 400,
+      message: "Đăng xuất thất bại"
     })
   }
 }

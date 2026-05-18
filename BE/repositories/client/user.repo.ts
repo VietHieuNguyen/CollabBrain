@@ -76,3 +76,4 @@ export const updateDataUser = async (id: string,data: UserTypes)=>{
     select: userPublicSelect
   })
 }
+
