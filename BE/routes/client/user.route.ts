@@ -15,4 +15,6 @@ router.post("/forgot-password/forgot",ratelimit.authIpLimiter,validate.forgotPas
 router.post("/forgot-password/otp", ratelimit.authIpLimiter,validate.verifyOTPPost, ratelimit.verifyOtpEmailLimiter,controller.verifyOTPPost)
 router.post("/forgot-password/reset",ratelimit.authIpLimiter,validate.resetPasswordPost,ratelimit.verifyOtpEmailLimiter, controller.resetPasswordPost)
 
+
+router.post("/refresh-token",authMiddleware.authMiddleware,controller.refreshTokenPost)
 export const userRoutes = router

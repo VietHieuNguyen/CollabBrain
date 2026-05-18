@@ -1,9 +1,19 @@
 import prisma from "../../config/prisma"
 
-export const findAccountByUsername = async (username: string)=>{
+export const findAccountByUsername = async (username: string) => {
   return prisma.account.findFirst({
-    where:{
-      username:username,
+    where: {
+      username: username,
+      isDeleted: false,
+      isActive: true
+    }
+  })
+}
+
+export const findAccountById = async (id: string) => {
+  return prisma.account.findFirst({
+    where: {
+      id: id,
       isDeleted: false,
       isActive: true
     }

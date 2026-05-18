@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { editProfileService, forgotPasswordServiceSendMail, loginService, registerService, resetPasswordService, verifyOTPForgotPassword, verifyOTPRegister } from "../../services/client/user.service";
+import { editProfileService, forgotPasswordServiceSendMail, loginService, refreshTokenService, registerService, resetPasswordService, verifyOTPForgotPassword, verifyOTPRegister } from "../../services/client/user.service";
 import { UserTypes } from "../../types/client/user.types";
 
 //[POSt] /user/login
@@ -8,7 +8,18 @@ export const loginPost = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     const result = await loginService({ email, password })
-    
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    })
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 5 * 60 * 1000
+    })
     res.status(200).json({
       code: 200,
       data: result
@@ -46,7 +57,18 @@ export const verifyOtpRegisterPost = async (req: Request, res: Response) => {
     const { email, otp, password, name } = req.body;
 
     const result = await verifyOTPRegister({ email, otp, password, name });
-
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    })
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 5 * 60 * 1000
+    })
     res.status(200).json({ code: 200, data: result });
   } catch (error: any) {
     res.status(400).json({ code: 400, message: error.message });
@@ -99,6 +121,19 @@ export const resetPasswordPost = async (req: Request, res: Response) => {
 
     const result = await resetPasswordService({ email, otp, password })
 
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    })
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 5 * 60 * 1000
+    })
+
     res.status(200).json({
       code: 200,
       data: result
@@ -110,7 +145,7 @@ export const resetPasswordPost = async (req: Request, res: Response) => {
     })
   }
 }
-export const userProfile = (req: Request, res: Response)=>{
+export const userProfile = (req: Request, res: Response) => {
   try {
     const user = (req as any).user
     res.status(200).json({
@@ -125,11 +160,11 @@ export const userProfile = (req: Request, res: Response)=>{
     })
   }
 }
- 
-export const editProfile = async(req: Request, res: Response)=>{
+
+export const editProfile = async (req: Request, res: Response) => {
   try {
     const user = (req as any).user
-    const result = await editProfileService(user.id,req.body)
+    const result = await editProfileService(user.id, req.body)
     res.status(200).json({
       code: 200,
       data: result,
@@ -142,4 +177,36 @@ export const editProfile = async(req: Request, res: Response)=>{
     });
   }
 
+}
+
+export const refreshTokenPost = async (req: Request, res: Response) => {
+
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({
+        code: 401,
+        message: "Không tìm thấy refresh token"
+      })
+    }
+    const result = await refreshTokenService(refreshToken)
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 5 * 60 * 1000
+    })
+    res.status(200).json({
+      code: 200,
+      data: result,
+      message: "Refresh token thành công"
+    })
+  } catch (error: any) {
+    res.clearCookie('accessToken')
+    res.clearCookie('refreshToken')
+    return res.status(400).json({
+      code: 400,
+      message: error.message || "Phiên đăng nhập hết hạn"
+    })
+  }
 }
