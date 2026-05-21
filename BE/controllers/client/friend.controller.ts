@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { acceptFriendPostService, getListFriendService, rejectFriendPostService } from "../../services/client/friend.service"
+import { acceptFriendPostService, blockFriendPatchService, getListFriendService, rejectFriendPostService, requestFriendPostService } from "../../services/client/friend.service"
 
 export const friendList = async (req: Request, res: Response) => {
   try {
@@ -18,12 +18,12 @@ export const friendList = async (req: Request, res: Response) => {
   }
 }
 
-export const acceptFriendPost = async (req: Request, res: Response)=>{
+export const acceptFriendPost = async (req: Request, res: Response) => {
   try {
-    
+
     const myId = (req as any).user.id
     const senderId: string = req.params.userId as string
-    const result = await acceptFriendPostService(senderId,myId,"ACCEPTED")
+    const result = await acceptFriendPostService(senderId, myId, "ACCEPTED")
     res.status(200).json({
       data: result.data,
       code: 200,
@@ -36,16 +36,56 @@ export const acceptFriendPost = async (req: Request, res: Response)=>{
     })
   }
 }
-export const rejectFriendPost = async(req: Request, res: Response)=>{
+//[POST] /friend/reject/:userId
+export const rejectFriendPost = async (req: Request, res: Response) => {
   try {
-     const myId = (req as any).user.id
+    const myId = (req as any).user.id
     const senderId: string = req.params.userId as string
-    const result = await rejectFriendPostService(senderId,myId)
+    const result = await rejectFriendPostService(senderId, myId)
     res.status(200).json({
       code: 200,
       message: "Xóa thành công"
     })
-  } catch (error:any) {
+  } catch (error: any) {
+    res.status(400).json({
+      code: 400,
+      message: `Lỗi: ${error.message}`
+    })
+  }
+}
+//[DELETE] /friend/request/:userId
+export const requestFriendPost = async (req: Request, res: Response) => {
+  try {
+    const myId = (req as any).user.id
+    const receiverId: string = req.params.userId as string
+    const result = await requestFriendPostService(myId, receiverId)
+    res.status(200).json({
+      code: 200,
+      message: "Gửi lời mời thành công",
+      data: result.data
+    })
+  } catch (error: any) {
+
+    res.status(400).json({
+      code: 400,
+      message: `Lỗi: ${error.message}`
+    })
+  }
+
+}
+
+//[PATCH] /friend/block/:userId
+export const blockFriendPatch = async (req: Request, res: Response) => {
+  try {
+    const myId = (req as any).user.id
+    const targetId: string = req.params.userId as string
+    const result = await blockFriendPatchService(myId, targetId)
+    res.status(200).json({
+      code: 200,
+      message: "Chặn thành công",
+      data: result.data
+    })
+  } catch (error: any) {
     res.status(400).json({
       code: 400,
       message: `Lỗi: ${error.message}`

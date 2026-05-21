@@ -50,3 +50,13 @@ export const deleteRowFriendShip = async (senderId: string, receiverId: string)=
     }
   })
 }
+
+export const createFriendShip = async (senderId: string, receiverId: string)=>{
+  return prisma.friendship.create({
+    data: {
+    senderId: senderId,
+    receiverId: receiverId
+    }
+    
+  })
+}
