@@ -17,6 +17,8 @@ const io = new Server(server, {
     credentials: true
   }
 })
+app.set("io",io)
+
 io.use(socketAuthMiddleware)
 chatSocket(io)
 app.use(cors({ origin: process.env.ORIGINAL_URL, credentials: true }));
@@ -28,7 +30,6 @@ app.use(expess.json())
 app.use(expess.urlencoded({ extended: true }))
 clientRoutes(app);
 adminRoutes(app)
-
 server.listen(PORT, () => {
   console.log(`App is listening on ${PORT}`)
 })

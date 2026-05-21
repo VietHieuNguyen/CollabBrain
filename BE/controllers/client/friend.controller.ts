@@ -24,6 +24,12 @@ export const acceptFriendPost = async (req: Request, res: Response) => {
     const myId = (req as any).user.id
     const senderId: string = req.params.userId as string
     const result = await acceptFriendPostService(senderId, myId, "ACCEPTED")
+    const io = req.app.get("io")
+    // Người gửi là: myId, người nhận là: senderId
+    io.to(senderId).emit("accept_friend_request", {
+      message: "Lời mời kết bạn của bạn đã được chấp nhận",
+      senderId: myId
+    })
     res.status(200).json({
       data: result.data,
       code: 200,
@@ -41,7 +47,7 @@ export const rejectFriendPost = async (req: Request, res: Response) => {
   try {
     const myId = (req as any).user.id
     const senderId: string = req.params.userId as string
-    const result = await rejectFriendPostService(senderId, myId)
+    await rejectFriendPostService(senderId, myId)
     res.status(200).json({
       code: 200,
       message: "Xóa thành công"
@@ -59,6 +65,12 @@ export const requestFriendPost = async (req: Request, res: Response) => {
     const myId = (req as any).user.id
     const receiverId: string = req.params.userId as string
     const result = await requestFriendPostService(myId, receiverId)
+    // người gửi là myId, người nhận là receiverId
+    const io = req.app.get("io")
+    io.to(receiverId).emit("new_request_friend", {
+      message:"Bạn có một lời mời kết bạn mới",
+      senderId: myId
+    })
     res.status(200).json({
       code: 200,
       message: "Gửi lời mời thành công",
