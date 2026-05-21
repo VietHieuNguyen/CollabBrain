@@ -36,7 +36,7 @@ export const acceptFriendPost = async (req: Request, res: Response) => {
     })
   }
 }
-//[POST] /friend/reject/:userId
+//[DELETE] /friend/reject/:userId
 export const rejectFriendPost = async (req: Request, res: Response) => {
   try {
     const myId = (req as any).user.id

@@ -30,6 +30,12 @@ enum FriendshipStatus {
   BLOCKED
 }
 
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+}
+
 enum GroupVisibility {
   PUBLIC   // Ai cũng thấy, user gửi request → owner duyệt
   PRIVATE  // Không ai thấy, owner tự thêm thành viên
@@ -77,6 +83,8 @@ model User {
   receivedFriendships Friendship[]      @relation("ReceivedFriendships")
   groupInvitations    GroupInvitation[]  @relation("InvitationUser")
   sentInvitations     GroupInvitation[]  @relation("InvitationSender")
+  sentMessages        Message[]         @relation("SentMessages")
+  receivedMessages    Message[]         @relation("ReceivedMessages")
   @@map("users")
 }
 
@@ -93,6 +101,7 @@ model Group {
   members     GroupMember[]
   documents   Document[]
   invitations GroupInvitation[]
+  messages    Message[]
   @@map("groups")
 }
 
@@ -173,4 +182,22 @@ model GroupInvitation {
 
   @@unique([groupId, userId])
   @@map("group_invitations")
+}
+model Message {
+  id         String      @id @default(uuid())
+  content    String
+  type       MessageType @default(TEXT)
+  senderId   String      @map("sender_id")
+  receiverId String?     @map("receiver_id")  // có = chat 1-1, null = chat group
+  groupId    String?     @map("group_id")     // có = chat group, null = chat 1-1
+  isRead     Boolean     @default(false) @map("is_read")
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User?  @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  group    Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([receiverId, createdAt])  // query chat 1-1 nhanh
+  @@index([groupId, createdAt])     // query chat group nhanh
+  @@map("messages")
 }
