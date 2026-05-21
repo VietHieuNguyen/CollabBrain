@@ -29,6 +29,8 @@ export const loginPost = async (req: Request, res: Response) => {
 
 }
 
+
+
 //[POST] /user/register - gửi email otp
 export const registerPost = async (req: Request, res: Response) => {
   try {
