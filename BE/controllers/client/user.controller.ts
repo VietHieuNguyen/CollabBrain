@@ -13,9 +13,7 @@ export const loginPost = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
     res.cookie("accessToken", result.accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
+      ...cookieConfig,
       maxAge: 5 * 60 * 1000
     })
     res.status(200).json({
@@ -60,9 +58,7 @@ export const verifyOtpRegisterPost = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000
     })
     res.cookie("accessToken", result.accessToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
+      ...cookieConfig,
       maxAge: 5 * 60 * 1000
     })
     res.status(200).json({ code: 200, data: result });

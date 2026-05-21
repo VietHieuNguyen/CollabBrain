@@ -7,21 +7,10 @@ interface AdminTokenPayload extends JwtPayload {
   id: string,
   role: string
 }
-const getToken = (req: Request) => {
-  const authorization = req.headers.authorization
-  if (!authorization) {
-    return ""
-  }
-  const [type, token] = authorization.split(" ");
-  if (type !== "Bearer" || !token) {
-    return ""
-  }
-  return token
-}
 
 export const authentication = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token = getToken(req)
+    const token = req.cookies.accessToken
     if (!token) {
       return res.status(401).json({
         code: 401,

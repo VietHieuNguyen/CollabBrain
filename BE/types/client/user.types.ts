@@ -22,3 +22,4 @@ export interface UserTypes {
   avatarUrl?: string,
   bio?: string
 }
+
