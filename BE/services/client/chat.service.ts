@@ -31,6 +31,4 @@ export const getChatHistoryService = async(myId: string, targetId: string)=>{
     data: messages,
     message: "Lấy lịch sử chat thành công"
   }
-
-  
 }

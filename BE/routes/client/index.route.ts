@@ -5,7 +5,7 @@ import { chatRoutes } from "./chat.route";
 
 const clientRoutes = (app: Application)=>{
 app.use("/user", userRoutes)
-app.use("/friend", friendRoutes)
+app.use("/friends", friendRoutes)
 app.use("/chat",chatRoutes)
 }
 export default clientRoutes;
