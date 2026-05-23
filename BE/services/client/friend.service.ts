@@ -78,6 +78,8 @@ export const unrequestFriendDeleteService = async (myId: string, targetId: strin
   } else {
     throw new Error("Không thể xóa")
   }
+  if (friendship.senderId !== myId) throw new Error("Không có quyền thực hiện thao tác này, do bạn không phải là người gửi")
+
   await deleteRowFriendShip(friendship.senderId, friendship.receiverId)
   return {
     message: "Đã hủy lời mời kết bạn thành công"
@@ -95,7 +97,6 @@ export const unfriendDeleteService = async (myId: string, targetId: string) => {
   } else {
     throw new Error("Không thể xóa")
   }
-  if (friendship.senderId !== myId) throw new Error("Không có quyền thực hiện thao tác này, do bạn không phải là người gửi")
   await deleteRowFriendShip(friendship.senderId, friendship.receiverId)
   return {
     message: "Đã hủy kết bạn thành công"
