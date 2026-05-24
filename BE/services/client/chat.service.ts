@@ -1,6 +1,6 @@
 import { MessageType } from "@prisma/client";
 import { findFriendship } from "../../repositories/client/friend.repo";
-import { createMessage, getMessageBetweenUsers } from "../../repositories/client/chat.repo";
+import { createMessage, findMessageById, getMessageBetweenUsers, markMessageAsRead, softDelete } from "../../repositories/client/chat.repo";
 
 
 export const sendMessageService = async(senderId: string, receiverId: string, content: string, type: MessageType="TEXT")=>{
@@ -30,5 +30,28 @@ export const getChatHistoryService = async(myId: string, targetId: string)=>{
   return {
     data: messages,
     message: "Lấy lịch sử chat thành công"
+  }
+}
+
+export const markReadService = async(myId:string, targetId: string) => {
+  const result = await markMessageAsRead(targetId,myId);
+  return {
+    data: result,
+    message: "Đã đánh dấu tin nhắn là đã đọc"
+  }
+  
+}
+
+export const deleteMessageService = async(myId: string, messageId: string)=>{
+  const message = await findMessageById(messageId)
+  if(!message) throw new Error("Không tồn tại tin nhắn")
+  if(message.senderId === myId)
+    await softDelete(messageId,"deletedBySender")
+  else if(message.receiverId === myId)
+    await softDelete(messageId,"deletedByReceiver")
+  else
+    throw new Error("Bạn không có quyền xóa tin nhắn này")
+  return{
+    message: "Xóa tin nhắn thành công"
   }
 }
