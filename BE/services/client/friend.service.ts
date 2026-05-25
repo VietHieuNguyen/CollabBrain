@@ -8,10 +8,11 @@ export const getListFriendService = async (id: string) => {
     message: "Lấy thành công danh sách bạn bè"
   }
 }
-export const getFriendBySearchKeyWord = async (keyword: string)=>{
-  const result = await getSearchSuggestions(keyword)
-  return{
-    data: result
+export const getFriendBySearchKeyWord = async (myId: string, keyword: string)=>{
+  const result = await getSearchSuggestions(myId, keyword)
+  return {
+    data: result,
+    message: "Tìm kiếm gợi ý thành công"
   }
 }
 

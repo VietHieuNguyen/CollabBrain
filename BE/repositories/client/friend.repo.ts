@@ -128,20 +128,67 @@ export const getSuggestFriend = async (myId: string, limit:number) => {
   `
 }
 
-export const getSearchSuggestions = async (keyword: string)=>{
+export const getSearchSuggestions = async (myId: string, keyword: string)=>{
   if(!keyword.trim()) return []
   const words = keyword.trim().split(/\s+/)
 
   const searchPattern = words.map((word,index)=> index ===  words.length -1 ?`${word}:*` : word).join(" & ")
-  return prisma.user.findMany({
+  const users = await prisma.user.findMany({
     where:{
+      id: { not: myId },
+      isDeleted: false,
+      isActive: true,
       name:{ 
         search: searchPattern
+      },
+      NOT: {
+        OR: [
+          {
+            sentFriendships: {
+              some: { receiverId: myId, status: "BLOCKED" }
+            }
+          },
+          {
+            receivedFriendships: {
+              some: { senderId: myId, status: "BLOCKED" }
+            }
+          }
+        ]
+      }
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatarUrl: true,
+      bio: true,
+      sentFriendships: {
+        where: { receiverId: myId },
+        select: { status: true, senderId: true, receiverId: true }
+      },
+      receivedFriendships: {
+        where: { senderId: myId },
+        select: { status: true, senderId: true, receiverId: true }
       }
     },
     take: 5
   })
 
+  return users.map(u => {
+    const friendship = u.sentFriendships[0] || u.receivedFriendships[0]
+    return {
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      avatarUrl: u.avatarUrl,
+      bio: u.bio,
+      friendship: friendship ? {
+        status: friendship.status,
+        senderId: friendship.senderId,
+        receiverId: friendship.receiverId
+      } : null
+    }
+  })
 }
 export const getListBlockedUser = async(myId: string)=>{
   return prisma.$queryRaw`

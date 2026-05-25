@@ -4,8 +4,8 @@ import { acceptFriendPostService, blockFriendPatchService, blockedListGetService
 export const friendList = async (req: Request, res: Response) => {
   try {
     const keyword = req.query.keyword as string;
+    const id = (req as any).user.id
     if(!keyword){
-      const id = (req as any).user.id
       const result = await getListFriendService(id)
       return res.status(200).json({
         data: result.data,
@@ -13,10 +13,11 @@ export const friendList = async (req: Request, res: Response) => {
         message: result.message
     })
     }
-    const result = await getFriendBySearchKeyWord(keyword)
+    const result = await getFriendBySearchKeyWord(id, keyword)
     res.status(200).json({
         data: result.data,
-        code: 200
+        code: 200,
+        message: result.message
       }) 
   } catch (error) {
     res.status(400).json({
