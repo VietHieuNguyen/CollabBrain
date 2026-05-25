@@ -17,6 +17,7 @@ export const getListFriend = async (id: string) => {
       END
     WHERE f.status = 'ACCEPTED'
       AND (f.sender_id = ${id} OR f.receiver_id = ${id})
+    ORDER BY f.updated_at DESC
   `
 }
 export const updateFriendShipStatus = async(senderId: string, receiverId:string, status: FriendshipStatus)=>{
@@ -67,12 +68,17 @@ export const getRequestedFriend = async(myId: string)=>{
       receiverId: myId,
       status:"PENDING"
     },
+    orderBy:{
+      createdAt: "desc"
+    },
     include:{
       sender:{
         select:{
+          id: true,
           name: true,
           avatarUrl: true,
-          email: true
+          email: true,
+          bio: true
         }
       }
     }
@@ -85,12 +91,17 @@ export const getSentFriend = async(myId: string)=>{
       senderId: myId,
       status: "PENDING"
     },
+    orderBy:{
+      createdAt: "desc"
+    },
     include:{
       receiver:{
         select:{
+          id: true,
           name:true,
           avatarUrl: true,
-          email: true
+          email: true,
+          bio: true
         }
       }
       
@@ -114,5 +125,40 @@ export const getSuggestFriend = async (myId: string, limit:number) => {
       )
     ORDER BY RANDOM()
     LIMIT ${limit}
+  `
+}
+
+export const getSearchSuggestions = async (keyword: string)=>{
+  if(!keyword.trim()) return []
+  const words = keyword.trim().split(/\s+/)
+
+  const searchPattern = words.map((word,index)=> index ===  words.length -1 ?`${word}:*` : word).join(" & ")
+  return prisma.user.findMany({
+    where:{
+      name:{ 
+        search: searchPattern
+      }
+    },
+    take: 5
+  })
+
+}
+export const getListBlockedUser = async(myId: string)=>{
+  return prisma.$queryRaw`
+    SELECT 
+      u.id,
+      u.name,
+      u.email,
+      u.avatar_url as "avatarUrl",
+      u.bio
+    FROM friendships f
+    JOIN users u
+      ON u.id = CASE
+        WHEN f.sender_id = ${myId} THEN f.receiver_id
+        WHEN f.receiver_id = ${myId} THEN f.sender_id
+      END
+    WHERE f.status = 'BLOCKED'
+      AND (f.sender_id = ${myId} OR f.receiver_id = ${myId})
+    ORDER BY f.updated_at DESC
   `
 }

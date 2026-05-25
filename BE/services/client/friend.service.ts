@@ -1,11 +1,17 @@
 import { FriendshipStatus } from "@prisma/client"
-import { createFriendShip, deleteRowFriendShip, findFriendship, getListFriend, getRequestedFriend, getSentFriend, getSuggestFriend, updateFriendShipStatus } from "../../repositories/client/friend.repo"
+import { createFriendShip, deleteRowFriendShip, findFriendship, getListFriend, getListBlockedUser, getRequestedFriend, getSearchSuggestions, getSentFriend, getSuggestFriend, updateFriendShipStatus } from "../../repositories/client/friend.repo"
 
 export const getListFriendService = async (id: string) => {
   const result = await getListFriend(id)
   return {
     data: result,
     message: "Lấy thành công danh sách bạn bè"
+  }
+}
+export const getFriendBySearchKeyWord = async (keyword: string)=>{
+  const result = await getSearchSuggestions(keyword)
+  return{
+    data: result
   }
 }
 
@@ -127,7 +133,7 @@ export const unblockFriendPatchService = async (myId: string, targetId: string) 
   if (!friendship || friendship.status !== "BLOCKED")
     throw new Error("Không có block nào để hủy")
 
-  const result = await updateFriendShipStatus(friendship.senderId, friendship.receiverId, "ACCEPTED")
+  const result = await deleteRowFriendShip(friendship.senderId, friendship.receiverId)
   return { data: result, message: "Hủy block thành công" }
 }
 
@@ -136,5 +142,13 @@ export const suggestionListGetService = async (myId: string, limit: number = 10)
   return {
     data: result,
     message: "Lấy danh sách gợi ý thành công"
+  }
+}
+
+export const blockedListGetService = async (myId: string)=>{
+  const result = await getListBlockedUser(myId)
+  return {
+    data: result,
+    message: "Lấy danh sách chặn thành công"
   }
 }
